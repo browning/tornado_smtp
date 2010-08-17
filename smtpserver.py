@@ -124,6 +124,7 @@ class SMTPConnection(object):
         self.stream = stream
         self.address = address
         self.request_callback = request_callback
+        self.stream.write("220 myserver Tornado Simple Mail Transfer Service Ready\r\n")
         self.stream.read_until("\r\n", self._parse_req)
 
     def write(self, chunk):
@@ -138,6 +139,7 @@ class SMTPConnection(object):
             self._finish_request()
 
     def _parse_req(self, data):
+        print "GOT SOMETHING."
         if data.find("HELO") > -1:
             self.stream.write("200 Ok\r\n")
             self.stream.read_until('\r\n', self._parse_req)
