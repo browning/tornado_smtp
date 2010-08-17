@@ -155,11 +155,12 @@ class SMTPConnection(object):
             self.stream.write("200 Ok\r\n")
             self.stream.read_until("\r\n", self._parse_req)
         elif data.find("DATA") > -1:
-            self.stream.write("354 End data with <CR><LF>.<CR><LF>")
+            self.stream.write("354 End data with <CR><LF>.<CR><LF>\r\n")
             self.stream.read_until("\r\n.\r\n", self._parse_msg)
         else:
             self.stream.read_until('\r\n', self._parse_req)
 
     def _parse_msg(self, data):
         print "GOT MESSAGE: " + data
+        self.stream.write("250 Ok\r\n")
         self.stream.read_until('\r\n', self._parse_req)
