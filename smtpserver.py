@@ -8,6 +8,7 @@ import logging
 import os
 import socket
 import time
+import email
 
 from tornado import ioloop
 from tornado import iostream
@@ -139,14 +140,12 @@ class SMTPConnection(object):
             self._finish_request()
 
     def _parse_req(self, data):
-        print "GOT SOMETHING: " + data
         if data.find("HELO") > -1 or data.find("EHLO") > -1:
             self.stream.write("250 myserver\r\n")
             self.stream.read_until('\r\n', self._parse_req)
         elif data.find("MAIL FROM") > -1:
             tokens = data.split(':')
             self.from_email = tokens[1]
-            print "from email: " + self.from_email
             self.stream.write("200 Ok\r\n")
             self.stream.read_until("\r\n", self._parse_req)
         elif data.find("RCPT TO") > -1:
@@ -161,6 +160,6 @@ class SMTPConnection(object):
             self.stream.read_until('\r\n', self._parse_req)
 
     def _parse_msg(self, data):
-        print "GOT MESSAGE: " + data
+        msg = email.message_from_string(data)
         self.stream.write("250 Ok\r\n")
         self.stream.read_until('\r\n', self._parse_req)
