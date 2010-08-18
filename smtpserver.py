@@ -162,4 +162,5 @@ class SMTPConnection(object):
     def _parse_msg(self, data):
         msg = email.message_from_string(data)
         self.stream.write("250 Ok\r\n")
+        self.request_callback(msg)
         self.stream.read_until('\r\n', self._parse_req)

@@ -1,3 +1,5 @@
  implementation of a SMTP server using tornado
- not working yet
- come back later
+ 
+look at smtp_test.py for example code
+seems to basically work right now, but hasn't been fully tested
+still a work in progress
