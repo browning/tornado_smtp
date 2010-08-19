@@ -134,10 +134,8 @@ class SMTPConnection(object):
             self.stream.write(chunk, self._on_write_complete)
 
     def finish(self):
-        assert self._request, "Request closed"
-        self._request_finished = True
         if not self.stream.writing():
-            self._finish_request()
+            self.stream.close()
 
     def _parse_req(self, data):
         if data.find("HELO") > -1 or data.find("EHLO") > -1:
@@ -156,7 +154,11 @@ class SMTPConnection(object):
         elif data.find("DATA") > -1:
             self.stream.write("354 End data with <CR><LF>.<CR><LF>\r\n")
             self.stream.read_until("\r\n.\r\n", self._parse_msg)
+        elif data.find("QUIT") > -1:
+            self.stream.write("221 myserver Service closing transmission channel\r\n")
+            self.finish()
         else:
+            print "unknown command: " + data
             self.stream.read_until('\r\n', self._parse_req)
 
     def _parse_msg(self, data):
